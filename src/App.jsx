@@ -4,11 +4,11 @@ import HeroSection from "./components/HeroSection";
 
 function App() {
   return (
-    <>
+    <div>
       <Header />
       <HeroSection />
       <About />
-    </>
+    </div>
   );
 }
 

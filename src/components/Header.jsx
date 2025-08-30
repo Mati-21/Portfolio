@@ -14,7 +14,7 @@ function Header() {
   const closeForm = () => setOpenContactForm(false);
 
   return (
-    <header className="absolute z-50 w-full transition-all duration-300">
+    <header className="sm:absolute z-50 w-full transition-all duration-300">
       {/* Container */}
       <div className="container mx-auto h-16 md:h-20 flex items-center px-4 sm:px-6 lg:px-8 justify-between">
         {/* Logo + Name */}
