@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import profile from "../asset/profile.png";
+import profile from "../asset/pro2.png";
 
 function About() {
   return (
@@ -43,12 +43,10 @@ function About() {
           </p>
         </div>
         {/* image */}
-        <div className="flex-1">
-          <img
-            src={profile}
-            alt=""
-            className="size-300 object-contain md:size-[500px] md:object-cover md:object-center "
-          />
+        <div className="flex-1 flex justify-center  p-5">
+          <div className="h-[400px] w-96  shadow-[0_0_20px_rgba(255,255,255,0.5)] rounded-lg co ">
+            <img src={profile} className="w-full h-full object-cover" alt="" />
+          </div>
         </div>
       </motion.div>
     </section>
