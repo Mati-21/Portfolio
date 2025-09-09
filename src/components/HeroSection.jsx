@@ -42,7 +42,6 @@ function HeroSection() {
       </div>
 
       {/* Right Side */}
-      <div className="w-[600px] h-96 bg-green-400">hello</div>
     </section>
   );
 }
