@@ -27,33 +27,33 @@ function Header() {
           <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-gray-500 to-gray-100 flex items-center justify-center text-purple-600 font-bold text-xl mr-3">
             M
           </div>
-          <span className="text-xl bg-gradient-to-r from-gray-300 to-green-100 bg-clip-text text-transparent font-bold">
+          <span className="text-xl sm:text-2xl md:text-3xl bg-gradient-to-r from-gray-300 to-green-100 bg-clip-text text-transparent font-bold">
             Mati
           </span>
         </motion.div>
 
         {/* Desktop Navigation */}
-        <div className="lg:flex hidden space-x-8">
+        <div className="hidden lg:flex space-x-6 xl:space-x-8">
           {["Home", "About", "Projects", "Experience", "Contact"].map(
             (item, index) => (
               <motion.a
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.7 + index * 0.2 }}
+                transition={{ duration: 0.3, delay: 0.7 + index * 0.15 }}
                 href={`#${item.toLowerCase()}`}
                 key={index}
-                className="relative text-gray-800 dark:text-gray-200 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors duration-300 group pb-1"
+                className="relative text-gray-800 dark:text-gray-200 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors duration-300 group pb-1 text-sm sm:text-base md:text-lg"
               >
                 {item}
                 {/* underline */}
-                <span className="absolute bottom-0 left-0 w-0 h-[3px] bg-violet-600 dark:bg-violet-400 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-violet-600 dark:bg-violet-400 group-hover:w-full transition-all duration-300"></span>
               </motion.a>
             )
           )}
         </div>
 
         {/* Social Icons + Hire Me */}
-        <div className="md:flex hidden items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-3 sm:space-x-4">
           {[FiGithub, FiTwitter, FiLinkedin].map((Icon, i) => (
             <motion.a
               key={i}
@@ -63,7 +63,7 @@ function Header() {
               href="#"
               className="text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400"
             >
-              <Icon className="w-5 h-5" />
+              <Icon className="w-4 sm:w-5 h-4 sm:h-5" />
             </motion.a>
           ))}
 
@@ -73,7 +73,7 @@ function Header() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 1.8 }}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-gray-400 to-gray-100 text-violet-700 font-bold hover:from-violet-700 hover:to-purple-700 hover:text-white transition-all duration-900 cursor-pointer"
+            className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-gray-400 to-gray-100 text-violet-700 font-bold hover:from-violet-700 hover:to-purple-700 hover:text-white transition-all duration-900 cursor-pointer text-sm sm:text-base"
           >
             Hire Me
           </motion.button>
@@ -97,77 +97,75 @@ function Header() {
       </div>
 
       {/* Mobile Menu */}
-      <motion.div
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: isOpen ? 1 : 0, height: isOpen ? "auto" : 0 }}
-        transition={{ duration: 0.5 }}
-        className="md:hidden overflow-hidden bg-white dark:bg-gray-900 shadow-lg px-4 py-5 space-y-5"
-      >
-        <nav className="flex flex-col space-y-3">
-          {["Home", "About", "Projects", "Experience", "Contact"].map(
-            (item, index) => (
-              <a
-                key={index}
-                href={`#${item.toLowerCase()}`}
-                onClick={toggleButton}
-                className="text-gray-300 font-medium py-2"
-              >
-                {item}
-              </a>
-            )
-          )}
-        </nav>
-
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-5">
-            {[FiGithub, FiTwitter, FiLinkedin].map((Icon, i) => (
-              <a key={i} href="#">
-                <Icon className="w-5 h-5 text-gray-300" />
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={openForm}
-          className="block mt-5 w-full px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-violet-400 text-white font-bold"
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: isOpen ? 1 : 0, height: isOpen ? "auto" : 0 }}
+          transition={{ duration: 0.4 }}
+          className={` ${
+            isOpen ? "flex flex-col" : "hidden"
+          } md:hidden overflow-hidden bg-white dark:bg-gray-900 shadow-lg px-4 py-5 space-y-5`}
         >
-          Contact Me
-        </button>
-      </motion.div>
+          <nav className="flex flex-col space-y-3">
+            {["Home", "About", "Projects", "Experience", "Contact"].map(
+              (item, index) => (
+                <a
+                  key={index}
+                  href={`#${item.toLowerCase()}`}
+                  onClick={toggleButton}
+                  className="text-gray-800 dark:text-gray-200 font-medium py-2 text-base"
+                >
+                  {item}
+                </a>
+              )
+            )}
+          </nav>
+
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex space-x-5">
+              {[FiGithub, FiTwitter, FiLinkedin].map((Icon, i) => (
+                <a key={i} href="#">
+                  <Icon className="w-5 h-5 text-gray-800 dark:text-gray-200" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={openForm}
+            className="block mt-5 w-full px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-violet-400 text-white font-bold"
+          >
+            Contact Me
+          </button>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Contact Form Modal */}
       <AnimatePresence>
         {openContactForm && (
-          <div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ duration: 0.4 }}
-              className=" bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full p-6 max-w-md"
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full p-6 max-w-md sm:max-w-lg"
             >
-              {/* form header */}
               <div className="flex justify-between items-center mb-4">
-                <h1 className="text-xl bold text-gray-300">Get in Touch</h1>
+                <h1 className="text-xl font-bold text-gray-800 dark:text-gray-300">
+                  Get in Touch
+                </h1>
                 <button onClick={closeForm}>
-                  <FiX className="w-5 h-5 font-extrabold text-gray-300" />
+                  <FiX className="w-5 h-5 font-extrabold text-gray-800 dark:text-gray-300" />
                 </button>
               </div>
 
-              {/* Form inputs */}
-              <form className="text-black">
+              <form className="text-black dark:text-white space-y-3">
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm  text-gray-300 font-medium mb-1"
+                    className="block text-sm text-gray-800 dark:text-gray-300 font-medium mb-1"
                   >
                     Name:
                   </label>
@@ -175,13 +173,13 @@ function Header() {
                     type="text"
                     id="name"
                     placeholder="Your Name"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-700"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-400 dark:border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-100 dark:bg-gray-700"
                   />
                 </div>
-                <div className="mt-2">
+                <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm  text-gray-300 font-medium mb-1"
+                    className="block text-sm text-gray-800 dark:text-gray-300 font-medium mb-1"
                   >
                     Email:
                   </label>
@@ -189,13 +187,13 @@ function Header() {
                     type="email"
                     id="email"
                     placeholder="Your Email"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-700"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-400 dark:border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-100 dark:bg-gray-700"
                   />
                 </div>
-                <div className="mt-2">
+                <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm  text-gray-300 font-medium mb-1"
+                    className="block text-sm text-gray-800 dark:text-gray-300 font-medium mb-1"
                   >
                     Message:
                   </label>
@@ -203,11 +201,10 @@ function Header() {
                     rows={4}
                     id="message"
                     placeholder="Type your message"
-                    className="w-full px-4 py-2 rounded-lg border border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-700"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-400 dark:border-gray-600 outline-none focus:ring-2 focus:ring-violet-600 bg-gray-100 dark:bg-gray-700"
                   />
                 </div>
 
-                {/* Form Button */}
                 <motion.button
                   type="submit"
                   whileHover={{ scale: 1.03 }}

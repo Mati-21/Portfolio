@@ -1,47 +1,78 @@
-import Spline from "@splinetool/react-spline";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import myVideo from "../asset/3141208-uhd_3840_2160_25fps.mp4";
 
 function HeroSection() {
-  const [cube, setCube] = useState(true);
+  const videoRef = useRef(null);
 
-  // ✅ useEffect to toggle cube every 10 seconds
+  // Slow down video
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCube((prev) => !prev);
-    }, 10000);
-
-    // Clear interval on unmount to prevent memory leaks
-    return () => clearInterval(interval);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.3; // slow motion
+    }
   }, []);
 
   return (
-    <section className="h-screen bg-gradient-to-b from-violet-900 to-black flex lg:flex-row flex-col-reverse items-center justify-between lg:px-24 px-10 relative overflow-hidden py-32">
-      {/* Left Side */}
-      <div>
+    <section className="relative h-screen overflow-hidden flex items-center justify-center">
+      {/* Video Background */}
+      <video
+        ref={videoRef}
+        src={myVideo}
+        className="absolute top-0 left-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+      />
+
+      {/* Overlay for better text readability */}
+      <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60"></div>
+
+      {/* Content */}
+      <div className="relative z-10 px-6 sm:px-10 lg:px-24 text-center lg:text-left max-w-6xl">
         <motion.h1
           initial={{ opacity: 0, y: 80 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, delay: 1.5 }}
-          className="text-5xl md:text-6xl lg:text-7xl font-bold text-center md:text-left z-10 mb-6"
+          className="text-2xl sm:text-5xl md:text-6xl lg:text-4xl font-bold text-white mb-6 leading-tight"
         >
-          Building Fast <br /> Reliable Results
+          Mati Melkamu
         </motion.h1>
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 2.5 }}
+          className="mt-8 text-2xl bg-orange-500 bg-clip-text text-transparent font-bold "
+        >
+          Full-Stack developer and UI Designer
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: 80 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, delay: 2.5 }}
-          className="max-w-xl text-center md:text-left text-white"
+          transition={{ duration: 1.2, delay: 3 }}
+          className="max-w-full sm:max-w-lg md:max-w-xl text-white mx-auto lg:mx-0 text-base sm:text-lg md:text-xl leading-relaxed mt-4"
         >
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum
-          similique eius facilis expedita dignissimos laborum voluptatibus
-          molestiae itaque. Accusantium dolor architecto dignissimos nobis
-          consectetur eos aut dicta cum mollitia doloribus!
+          When I'm not coding, I enjoy exploring new technologies, learning
+          about sustainable development projects, and building practical
+          solutions that make a positive impact.
         </motion.p>
-      </div>
 
-      {/* Right Side */}
+        {/* Optional CTA button */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 3.5 }}
+          className="mt-8"
+        >
+          <a
+            href="#contact"
+            className="inline-block px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl transition"
+          >
+            Contact Me
+          </a>
+        </motion.div>
+      </div>
     </section>
   );
 }
