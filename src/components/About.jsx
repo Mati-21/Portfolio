@@ -9,7 +9,7 @@ function About() {
           initial={{ opacity: 0, y: 300 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          viewport={{ amount: 0.5 }}
+          viewport={{ amount: 0.5, once: true }}
           className="text-4xl md:text-6xl font-bold sm:mb-16 mt-10  text-center  text-white"
         >
           About Me
@@ -19,7 +19,7 @@ function About() {
       <motion.div
         initial={{ opacity: 0, y: 200 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1.5 }}
+        transition={{ duration: 0.8 }}
         viewport={{ amount: 0.1 }}
         className="flex flex-col gap-2 p-2 md:flex-row md:items-center mt-6"
       >

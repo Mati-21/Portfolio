@@ -42,13 +42,7 @@ function HeroSection() {
       </div>
 
       {/* Right Side */}
-      <div className="w-[600px] h-[600px]">
-        {cube ? (
-          <Spline scene="https://prod.spline.design/b4u-ViwvMcbtUD07/scene.splinecode" />
-        ) : (
-          <Spline scene="https://prod.spline.design/ja7Qp0LIKo-NsUBx/scene.splinecode" />
-        )}
-      </div>
+      <div className="w-[600px] h-96 bg-green-400">hello</div>
     </section>
   );
 }
