@@ -1,4 +1,5 @@
 import { useScroll, useTransform, motion } from "framer-motion";
+import Skills from "./Skills";
 
 function Hidden() {
   const { scrollY } = useScroll();
@@ -27,7 +28,9 @@ function Hidden() {
         clipPath, // rotates in degrees
       }}
     >
-      <div className="h-full w-full bg-black/50"></div>
+      <div className="h-full w-full bg-black/50">
+        <Skills />
+      </div>
     </motion.div>
   );
 }
