@@ -146,7 +146,7 @@ function About() {
             <div className="relative">
               <div className="relative z-10 w-96 h-[36rem] rounded-xl overflow-hidden shadow-lg border-4 border-gray-700">
                 <img
-                  src={profile}
+                  src="https://images.pexels.com/photos/1516680/pexels-photo-1516680.jpeg"
                   className="w-full h-full object-cover"
                   alt="Profile"
                 />

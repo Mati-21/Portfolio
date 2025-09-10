@@ -24,6 +24,35 @@ function HeroSection() {
         loop
       />
 
+      {/* Scroll indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 z-40 transform -translate-x-1/2 flex flex-col items-center text-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <span className="text-sm mb-2 text-white">Scroll to explore</span>
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="white"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
+        </motion.div>
+      </motion.div>
+
       {/* Overlay for better text readability */}
       <div className="absolute top-0 left-0 w-full h-full bg-black opacity-60"></div>
 
@@ -35,7 +64,7 @@ function HeroSection() {
           transition={{ duration: 1.2, delay: 1.5 }}
           className="text-2xl sm:text-5xl md:text-6xl lg:text-4xl font-bold text-white mb-6 leading-tight"
         >
-          Mati Melkamu
+          Hi I'am Mati Melkamu
         </motion.h1>
 
         <motion.div

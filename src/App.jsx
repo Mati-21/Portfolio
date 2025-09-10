@@ -1,9 +1,12 @@
 import About from "./components/About";
+import Footer from "./components/Footer";
+
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
 import Hidden from "./components/Hidden";
 import ProjectSection from "./components/ProjectSection";
-import { ReactLenis } from "@studio-freight/react-lenis";
+import Reveal from "./components/Reveal";
+// import { ReactLenis } from "@studio-freight/react-lenis";
 
 function App() {
   return (
@@ -17,18 +20,11 @@ function App() {
 
       <About />
       <ProjectSection />
-      <div className="h-screen"></div>
+
+      <Reveal />
     </div>
     // </ReactLenis>
   );
 }
 
 export default App;
-
-{
-  /* <ReactLenis root>
-  <Header />
-  <HeroSection />
-  <CenteredImage />
-</ReactLenis>; */
-}

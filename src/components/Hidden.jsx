@@ -9,15 +9,16 @@ function Hidden() {
   const clipPath = useTransform(
     scrollY,
     [0, 1300],
-    ["circle(2% at 30% 50%)", "circle(100% at 50% 50%)"]
+    ["circle(2% at 25% 60%)", "circle(100% at 50% 50%)"]
   );
 
   return (
     <motion.div
       className="h-screen bg-amber-50 sticky top-0"
       style={{
-        backgroundImage: `url("https://images.hdqwalls.com/download/hot-spicy-burger-ys-3840x2160.jpg")`,
-        backgroundSize: "cover",
+        // backgroundImage: `url("https://images.hdqwalls.com/download/hot-spicy-burger-ys-3840x2160.jpg")`,
+        backgroundImage: `url("https://images.pexels.com/photos/572056/pexels-photo-572056.jpeg")`,
+        backgroundSize: "contain",
         backgroundPosition: "bottom",
         backgroundRepeat: "no-repeat",
         overflowX: "hidden",
@@ -25,7 +26,9 @@ function Hidden() {
         opacity, // fades away
         clipPath, // rotates in degrees
       }}
-    />
+    >
+      <div className="h-full w-full bg-black/50"></div>
+    </motion.div>
   );
 }
 
