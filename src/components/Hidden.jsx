@@ -28,7 +28,7 @@ function Hidden() {
         clipPath, // rotates in degrees
       }}
     >
-      <div className="h-full w-full bg-black/50">
+      <div id="skills" className="h-full w-full bg-black/50">
         <Skills />
       </div>
     </motion.div>

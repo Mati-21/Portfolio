@@ -26,7 +26,7 @@ function Reveal() {
   );
 
   return (
-    <div ref={containerRef} className="h-[2000px] relative">
+    <div id="contact" ref={containerRef} className="h-[2000px] relative">
       <motion.div
         style={{
           backgroundColor: "white",

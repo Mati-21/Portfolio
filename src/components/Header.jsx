@@ -34,10 +34,10 @@ function Header() {
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex space-x-6 xl:space-x-8">
-          {["Home", "About", "Projects", "Experience", "Contact"].map(
+          {["Home", "About", "Projects", "Experience", "Skills"].map(
             (item, index) => (
               <motion.a
-                href={`${item[index]}`}
+                href={`#${item.toLowerCase()}`}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.7 + index * 0.15 }}

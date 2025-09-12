@@ -68,7 +68,7 @@ function ProjectSection() {
   }, [scrollYProgress]);
 
   return (
-    <div ref={containerRef} className="relative top-0 h-[400vh]">
+    <div id="projects" ref={containerRef} className="relative top-0 h-[400vh]">
       {/* Sticky wrapper with animated dark background */}
       <motion.div
         style={{ backgroundColor }}

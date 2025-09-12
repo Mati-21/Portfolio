@@ -13,7 +13,10 @@ function HeroSection() {
   }, []);
 
   return (
-    <section className="absolute h-screen overflow-hidden flex items-center justify-center">
+    <section
+      id="home"
+      className="absolute h-screen overflow-hidden flex items-center justify-center"
+    >
       {/* Video Background */}
       <video
         ref={videoRef}

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 function About() {
   return (
     <section
-      id="About"
+      id="about"
       className="relative py-24 bg-gray-800 text-white overflow-hidden"
     >
       {/* Background pattern */}
