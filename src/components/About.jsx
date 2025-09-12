@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
-import profile from "../asset/pro2.png";
 
 function About() {
   return (
-    <section className="relative py-24 bg-gray-800 text-white overflow-hidden">
+    <section
+      id="About"
+      className="relative py-24 bg-gray-800 text-white overflow-hidden"
+    >
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-72 h-72 bg-blue-400 rounded-full filter blur-3xl opacity-20"></div>
@@ -95,7 +97,7 @@ function About() {
                 viewport={{ once: true }}
                 className="text-center p-4 bg-gray-700 rounded-lg shadow-sm border border-gray-600"
               >
-                <div className="text-2xl font-bold text-white mb-1">15+</div>
+                <div className="text-2xl font-bold text-white mb-1">4+</div>
                 <div className="text-sm text-gray-300">Projects Completed</div>
               </motion.div>
               <motion.div

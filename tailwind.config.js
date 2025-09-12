@@ -47,6 +47,11 @@ export default {
           900: "#581C87",
         },
       },
+      boxShadow: {
+        soft: "0 4px 10px rgba(0, 0, 0, 0.1)", // light shadow
+        glow: "0 0 15px rgba(59, 130, 246, 0.6)", // blue glow
+        deep: "0 0 10px rgba(0, 0, 0, 0.85)", // stronger depth
+      },
     },
   },
 };

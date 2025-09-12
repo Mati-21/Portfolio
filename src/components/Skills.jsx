@@ -5,7 +5,14 @@ import {
   FaReact,
   FaNodeJs,
 } from "react-icons/fa";
-import { SiMongodb, SiDocker, SiRedux, SiTailwindcss } from "react-icons/si";
+import {
+  SiMongodb,
+  SiDocker,
+  SiRedux,
+  SiTailwindcss,
+  SiMongoose,
+  SiExpress,
+} from "react-icons/si";
 
 function Skills() {
   const skills = {
@@ -23,8 +30,10 @@ function Skills() {
     Backend: [
       { name: "Node.js", icon: <FaNodeJs className="text-green-500" /> },
       { name: "MongoDB", icon: <SiMongodb className="text-green-600" /> },
+      { name: "Express js", icon: <SiExpress className="text-green-600" /> },
+      { name: "Mongoose", icon: <SiMongoose className="text-green-600" /> },
     ],
-    Tools: [{ name: "Docker", icon: <SiDocker className="text-blue-400" /> }],
+
     SoftSkills: [
       { name: "Teamwork 🤝" },
       { name: "Problem-Solving 🧩" },
@@ -33,9 +42,9 @@ function Skills() {
   };
 
   return (
-    <section className="py-16 bg-gray-100/50 h-full" id="skills">
+    <section className="py-16 bg-white" id="skills">
       <div className="max-w-5xl mx-auto px-6 text-center">
-        <h2 className="text-3xl font-bold mb-12 text-gray-900 ">
+        <h2 className="text-3xl font-bold mb-12 text-gray-900">
           ⚡ Skills & Tech Stack
         </h2>
 
@@ -44,10 +53,10 @@ function Skills() {
           {Object.entries(skills).map(([category, skillList]) => (
             <div
               key={category}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 
-                         hover:shadow-xl transition"
+              className="bg-gray-50 rounded-2xl shadow-lg p-6 
+                         hover:shadow-2xl transition duration-300"
             >
-              <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+              <h3 className="text-xl font-semibold mb-4 text-gray-900">
                 {category}
               </h3>
               <ul className="space-y-3">
@@ -55,8 +64,7 @@ function Skills() {
                   <li
                     key={index}
                     className="flex items-center gap-3 
-                               text-gray-700 dark:text-gray-300 
-                               hover:text-black dark:hover:text-white"
+                               text-gray-700 hover:text-gray-900 transition"
                   >
                     {skill.icon && (
                       <span className="text-2xl">{skill.icon}</span>

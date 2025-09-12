@@ -37,10 +37,10 @@ function Header() {
           {["Home", "About", "Projects", "Experience", "Contact"].map(
             (item, index) => (
               <motion.a
+                href={`${item[index]}`}
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.7 + index * 0.15 }}
-                href={`#${item.toLowerCase()}`}
                 key={index}
                 className="relative text-gray-800 dark:text-gray-200 hover:text-violet-600 dark:hover:text-violet-400 font-medium transition-colors duration-300 group pb-1 text-sm sm:text-base md:text-lg"
               >

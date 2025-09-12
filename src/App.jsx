@@ -6,7 +6,6 @@ import HeroSection from "./components/HeroSection";
 import Hidden from "./components/Hidden";
 import ProjectSection from "./components/ProjectSection";
 import Reveal from "./components/Reveal";
-// import { ReactLenis } from "@studio-freight/react-lenis";
 
 function App() {
   return (
