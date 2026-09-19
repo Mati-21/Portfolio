@@ -4,28 +4,89 @@
 
 html {
   scroll-behavior: smooth;
-  /* Hide default cursor */
+  scroll-padding-top: 5rem;
+}
+
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
   overflow-x: hidden;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   margin: 0;
   padding: 0;
   width: 100%;
-
   position: relative;
-  background-color: black;
-  color: white;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Hide default cursor on interactive elements */
+html.dark body {
+  background-color: #0b0c10;
+  color: #f3f4f6;
+}
+
+html.light body, html:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #27273a;
+  border-radius: 9999px;
+  border: 2px solid #090a0f;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #7c3aed;
+}
+
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+  border: 2px solid #f1f5f9;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+/* Set pointer cursor on interactive elements */
 a,
 button,
-input,
-textarea,
-select {
-  cursor: none;
+[role="button"] {
+  cursor: pointer;
 }
 
 section {
@@ -44,18 +105,6 @@ section {
   height: 200vh;
 }
 
-/* Show default cursor on mobile */
-@media (max-width: 768px) {
-  html,
-  body,
-  a,
-  button,
-  input,
-  textarea,
-  select {
-    cursor: auto;
-  }
-}
 
 /* Responsive text sizing */
 @media (max-width: 640px) {

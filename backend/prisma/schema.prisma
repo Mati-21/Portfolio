@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────
+// Admin — only one record exists (seeded from .env)
+// ─────────────────────────────────────────
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // bcrypt hash
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────
+// Content — key-value store per section
+// section: "hero" | "about" | "skills" | "projects" | "contact"
+// ─────────────────────────────────────────
+model Content {
+  id        String   @id @default(cuid())
+  section   String   // e.g. "hero"
+  key       String   // e.g. "title"
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@unique([section, key])
+  @@index([section])
+}
+
+// ─────────────────────────────────────────
+// Contact — messages submitted via the portfolio contact form
+// ─────────────────────────────────────────
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
+// VisitorSession — individual visitor session record
+// ─────────────────────────────────────────
+model VisitorSession {
+  id        String           @id @default(cuid())
+  sessionId String           @unique
+  device    String?          // "Desktop" | "Mobile" | "Tablet"
+  browser   String?          // e.g. "Chrome", "Safari"
+  os        String?          // e.g. "Windows", "iOS", "Android"
+  referrer  String?
+  events    AnalyticsEvent[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────
+// AnalyticsEvent — section dwell time and click logs
+// ─────────────────────────────────────────
+model AnalyticsEvent {
+  id        String         @id @default(cuid())
+  sessionId String
+  session   VisitorSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  type      String         // "section_dwell" | "click"
+  section   String?        // "home" | "about" | "skills" | "projects" | "contact" | "detail:..."
+  element   String?        // e.g. "Hire Me Button", "Live Demo Link", "GitHub Repo"
+  label     String?        // contextual description or label
+  url       String?        // target link URL if applicable
+  duration  Int?           // dwell time in seconds (e.g. 45)
+  metadata  String?        // optional JSON or notes
+  createdAt DateTime       @default(now())
+
+  @@index([sessionId])
+  @@index([type])
+  @@index([section])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────
+// MediaImage — catalog of all uploaded portfolio images in Cloudinary
+// ─────────────────────────────────────────
+model MediaImage {
+  id        String   @id @default(cuid())
+  name      String   // original filename or descriptive title
+  url       String   // Cloudinary secure HTTPS URL
+  publicId  String   @unique // Cloudinary public_id (e.g. "portfolio/avatar-...")
+  format    String?  // jpg, png, webp, etc.
+  bytes     Int?     // file size in bytes
+  width     Int?
+  height    Int?
+  section   String?  // "about", "projects", "avatar", etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([section])
+  @@index([publicId])
+}
+
