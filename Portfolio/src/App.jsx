@@ -30,9 +30,15 @@ function PortfolioContent() {
   const savedCardDeltaRef = useRef(null);
   const isRestoringScrollRef = useRef(false);
 
-  // Initialize analytics tracker
+  // Initialize analytics tracker on idle to avoid blocking first paint
   useEffect(() => {
-    analytics.init();
+    if (typeof window !== "undefined") {
+      if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(() => analytics.init(), { timeout: 2000 });
+      } else {
+        setTimeout(() => analytics.init(), 1000);
+      }
+    }
   }, []);
 
   // Update analytics section when on project detail page or switching back

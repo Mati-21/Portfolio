@@ -1,34 +1,76 @@
 import { motion } from "framer-motion";
-import { useEffect, useRef } from "react";
-import myVideo from "../asset/3141208-uhd_3840_2160_25fps.mp4";
+import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
 import { useContent } from "../context/ContentContext";
 
 function HeroSection() {
   const videoRef = useRef(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const { content } = useContent();
   const hero = content?.hero || {};
 
-  // Slow down video
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.3; // slow motion
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Explicitly enforce muted state for strict browser autoplay policies
+    video.muted = true;
+    video.defaultMuted = true;
+
+    const startPlayback = () => {
+      video.playbackRate = 0.4;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsVideoPlaying(true);
+          })
+          .catch(() => {
+            // Autoplay was prevented by browser/power-saver, poster image handles background flawlessly
+          });
+      }
+    };
+
+    if (video.readyState >= 3) {
+      startPlayback();
+    } else {
+      video.addEventListener("canplay", startPlayback, { once: true });
+      video.addEventListener("playing", () => setIsVideoPlaying(true), { once: true });
     }
+
+    return () => {
+      video.removeEventListener("canplay", startPlayback);
+    };
   }, []);
 
   return (
     <section
       id="home"
-      className="relative w-full h-screen overflow-hidden flex items-center justify-center"
+      className="relative w-full h-screen overflow-hidden flex items-center justify-center bg-slate-950"
     >
-      {/* Video Background */}
+      {/* Instant visual fallback poster so first paint is 0ms */}
+      <img
+        src="/hero-frame.jpg"
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
+      />
+
+      {/* Lightweight Streamable Video Background (3.5 MB with faststart, playsInline) */}
       <video
         ref={videoRef}
-        src={myVideo}
-        className="absolute top-0 left-0 w-full h-full object-cover"
+        src="/hero-bg.mp4"
+        poster="/hero-frame.jpg"
+        className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 select-none ${
+          isVideoPlaying ? "opacity-100" : "opacity-0"
+        }`}
         autoPlay
         muted
+        playsInline
         loop
+        preload="auto"
+        onPlaying={() => setIsVideoPlaying(true)}
       />
 
       {/* Scroll indicator */}

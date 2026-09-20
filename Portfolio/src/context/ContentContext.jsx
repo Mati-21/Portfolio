@@ -9,8 +9,16 @@ const ContentContext = createContext({
 });
 
 export function ContentProvider({ children }) {
-  const [content, setContent] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState(() => {
+    try {
+      const cached = localStorage.getItem("portfolio_cached_content");
+      if (cached) return JSON.parse(cached);
+    } catch {
+      // ignore
+    }
+    return {};
+  });
+  const [loading, setLoading] = useState(false);
 
   const fetchContent = async () => {
     try {
@@ -19,6 +27,11 @@ export function ContentProvider({ children }) {
         const json = await res.json();
         if (json && json.content) {
           setContent(json.content);
+          try {
+            localStorage.setItem("portfolio_cached_content", JSON.stringify(json.content));
+          } catch {
+            // ignore
+          }
         }
       }
     } catch {
@@ -30,11 +43,6 @@ export function ContentProvider({ children }) {
 
   useEffect(() => {
     fetchContent();
-
-    // Listen for storage / window focus events so preview updates in real-time
-    const handleFocus = () => fetchContent();
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   const resolveMediaUrl = (url) => {
