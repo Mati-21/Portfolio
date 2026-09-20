@@ -113,15 +113,71 @@ router.post("/track", async (req, res) => {
 // ─────────────────────────────────────────────────
 router.get("/overview", requireAuth, async (req, res) => {
   try {
+    const { period, date, startDate, endDate } = req.query;
+
+    let dateFilter = null;
+    const now = new Date();
+
+    if (period === "today") {
+      const start = new Date(now);
+      start.setHours(0, 0, 0, 0);
+      dateFilter = { gte: start };
+    } else if (period === "yesterday") {
+      const start = new Date(now);
+      start.setDate(start.getDate() - 1);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(now);
+      end.setDate(end.getDate() - 1);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { gte: start, lte: end };
+    } else if (period === "7d") {
+      const start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      dateFilter = { gte: start };
+    } else if (period === "30d") {
+      const start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      dateFilter = { gte: start };
+    } else if (date) {
+      // Single specific date: YYYY-MM-DD
+      const parts = date.split("-").map(Number);
+      if (parts.length === 3 && !parts.some(isNaN)) {
+        const [year, month, day] = parts;
+        const start = new Date(year, month - 1, day, 0, 0, 0, 0);
+        const end = new Date(year, month - 1, day, 23, 59, 59, 999);
+        dateFilter = { gte: start, lte: end };
+      }
+    } else if (startDate || endDate) {
+      dateFilter = {};
+      if (startDate) {
+        const parts = startDate.split("-").map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) {
+          dateFilter.gte = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0);
+        } else {
+          dateFilter.gte = new Date(startDate);
+        }
+      }
+      if (endDate) {
+        const parts = endDate.split("-").map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) {
+          dateFilter.lte = new Date(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999);
+        } else {
+          dateFilter.lte = new Date(endDate);
+        }
+      }
+    }
+
+    const sessionWhere = dateFilter ? { createdAt: dateFilter } : {};
+    const eventWhere = dateFilter ? { createdAt: dateFilter } : {};
+
     // 1. Basic counts
-    const totalVisitors = await prisma.visitorSession.count();
-    const totalEvents = await prisma.analyticsEvent.count();
+    const totalVisitors = await prisma.visitorSession.count({ where: sessionWhere });
+    const totalEvents = await prisma.analyticsEvent.count({ where: eventWhere });
 
     // 2. Dwell time stats
     const dwellEvents = await prisma.analyticsEvent.findMany({
       where: {
         type: "section_dwell",
         duration: { not: null, gt: 0 },
+        ...(dateFilter ? { createdAt: dateFilter } : {}),
       },
       select: {
         section: true,
@@ -175,6 +231,7 @@ router.get("/overview", requireAuth, async (req, res) => {
 
     // 4. Project-specific read and dwell analysis
     const allEvents = await prisma.analyticsEvent.findMany({
+      where: dateFilter ? { createdAt: dateFilter } : {},
       select: {
         sessionId: true,
         type: true,
@@ -247,7 +304,10 @@ router.get("/overview", requireAuth, async (req, res) => {
 
     // 5. Top Clicked Elements / CTAs
     const clickEvents = await prisma.analyticsEvent.findMany({
-      where: { type: "click" },
+      where: {
+        type: "click",
+        ...(dateFilter ? { createdAt: dateFilter } : {}),
+      },
       select: { element: true, label: true, section: true, url: true },
     });
 
@@ -272,6 +332,7 @@ router.get("/overview", requireAuth, async (req, res) => {
 
     // 6. Device & Browser Breakdown
     const sessions = await prisma.visitorSession.findMany({
+      where: dateFilter ? { createdAt: dateFilter } : {},
       select: {
         device: true,
         browser: true,
@@ -296,10 +357,12 @@ router.get("/overview", requireAuth, async (req, res) => {
 
     // 7. Recent Visitor Journeys (last 50 sessions with their events chronologically)
     const recentSessions = await prisma.visitorSession.findMany({
+      where: dateFilter ? { createdAt: dateFilter } : {},
       orderBy: { createdAt: "desc" },
       take: 50,
       include: {
         events: {
+          where: dateFilter ? { createdAt: dateFilter } : {},
           orderBy: { createdAt: "asc" },
         },
       },
@@ -360,6 +423,12 @@ router.get("/overview", requireAuth, async (req, res) => {
     });
 
     return res.json({
+      filter: {
+        period: period || (date ? "date" : (startDate || endDate ? "custom" : "all")),
+        date: date || null,
+        startDate: startDate || null,
+        endDate: endDate || null,
+      },
       summary: {
         totalVisitors,
         totalEvents,

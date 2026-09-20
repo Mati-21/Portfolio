@@ -59,7 +59,7 @@ export const uploadApi = {
 
 // ── Analytics ──────────────────────────────────────────────────────────────
 export const analyticsApi = {
-  getOverview:   () => api.get("/analytics/overview"),
+  getOverview:   (params) => api.get("/analytics/overview", { params }),
   clearAll:      () => api.delete("/analytics/clear"),
   deleteSession: (sessionId) => api.delete(`/analytics/sessions/${sessionId}`),
 };

@@ -27,7 +27,29 @@ import {
   BookOpen,
   ArrowRight,
   TrendingUp,
+  Calendar,
+  CalendarDays,
+  ChevronDown,
 } from "lucide-react";
+
+function getFilterLabel(period, customType, selectedDate, startDate, endDate) {
+  if (period === "today") return "Today";
+  if (period === "yesterday") return "Yesterday";
+  if (period === "7d") return "Last 7 Days";
+  if (period === "30d") return "Last 30 Days";
+  if (period === "custom") {
+    if (customType === "single" && selectedDate) {
+      return `Date: ${selectedDate}`;
+    }
+    if (startDate && endDate) {
+      return `${startDate} → ${endDate}`;
+    }
+    if (startDate) return `From ${startDate}`;
+    if (endDate) return `Until ${endDate}`;
+    return "Custom Date Range";
+  }
+  return "All Time";
+}
 
 // Format seconds into "1m 45s" or "32s"
 function formatDuration(seconds) {
@@ -90,10 +112,33 @@ export default function Analytics() {
   const [showClearModal, setShowClearModal] = useState(false);
   const [clearing, setClearing] = useState(false);
 
+  // Date & Days filtering state
+  const [period, setPeriod] = useState("all"); // "all" | "today" | "yesterday" | "7d" | "30d" | "custom"
+  const [customType, setCustomType] = useState("range"); // "range" | "single"
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString().slice(0, 10);
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [showCustom, setShowCustom] = useState(false);
+
   const fetchOverview = async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
-      const res = await analyticsApi.getOverview();
+      const params = {};
+      if (period !== "all" && period !== "custom") {
+        params.period = period;
+      } else if (period === "custom") {
+        if (customType === "single" && selectedDate) {
+          params.date = selectedDate;
+        } else {
+          if (startDate) params.startDate = startDate;
+          if (endDate) params.endDate = endDate;
+        }
+      }
+      const res = await analyticsApi.getOverview(params);
       setData(res.data);
     } catch (err) {
       console.error("Failed to load analytics overview:", err);
@@ -105,7 +150,7 @@ export default function Analytics() {
 
   useEffect(() => {
     fetchOverview();
-  }, []);
+  }, [period, customType, selectedDate, startDate, endDate]);
 
   // Polling interval
   useEffect(() => {
@@ -114,7 +159,7 @@ export default function Analytics() {
       fetchOverview();
     }, 10000);
     return () => clearInterval(timer);
-  }, [autoRefresh]);
+  }, [autoRefresh, period, customType, selectedDate, startDate, endDate]);
 
   const handleCopy = (e, text, id) => {
     e.stopPropagation();
@@ -238,6 +283,142 @@ export default function Analytics() {
             Clear Data
           </button>
         </div>
+      </div>
+
+      {/* ── Date & Days Filter Bar ── */}
+      <div className="card p-3 sm:p-4 border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-surface/70 backdrop-blur-md transition-all">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          {/* Preset Buttons */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-xs font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wider mr-1 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-violet-500" />
+              Period:
+            </span>
+
+            {[
+              { id: "all", label: "All Time" },
+              { id: "today", label: "Today" },
+              { id: "yesterday", label: "Yesterday" },
+              { id: "7d", label: "Last 7 Days" },
+              { id: "30d", label: "Last 30 Days" },
+            ].map((p) => (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setPeriod(p.id);
+                  setShowCustom(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                  period === p.id
+                    ? "bg-violet-600 text-white shadow-sm shadow-violet-600/30 font-semibold"
+                    : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-white/10"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+
+            <button
+              onClick={() => {
+                setPeriod("custom");
+                setShowCustom((prev) => (period === "custom" ? !prev : true));
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+                period === "custom"
+                  ? "bg-violet-600 text-white shadow-sm shadow-violet-600/30 font-semibold"
+                  : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-gray-400 hover:bg-slate-200 dark:hover:bg-white/10"
+              }`}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              Custom Date...
+              <ChevronDown className={`w-3 h-3 transition-transform ${showCustom ? "rotate-180" : ""}`} />
+            </button>
+          </div>
+
+          {/* Active Filter Indicator / Reset */}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-slate-500 dark:text-gray-400">
+              Active: <strong className="text-violet-600 dark:text-violet-400 font-semibold">{getFilterLabel(period, customType, selectedDate, startDate, endDate)}</strong>
+            </span>
+            {period !== "all" && (
+              <button
+                onClick={() => {
+                  setPeriod("all");
+                  setShowCustom(false);
+                }}
+                className="inline-flex items-center gap-1 text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 transition-colors ml-1"
+                title="Reset to All Time"
+              >
+                <X className="w-3.5 h-3.5" />
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Expandable Custom Date Picker Form */}
+        {showCustom && period === "custom" && (
+          <div className="mt-3 pt-3 border-t border-slate-200/80 dark:border-white/5 flex items-center gap-3 flex-wrap animate-fade-in">
+            {/* Mode toggle */}
+            <div className="flex items-center bg-slate-100 dark:bg-white/5 rounded-lg p-0.5 text-xs">
+              <button
+                type="button"
+                onClick={() => setCustomType("range")}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  customType === "range"
+                    ? "bg-white dark:bg-surface font-semibold text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 dark:text-gray-400"
+                }`}
+              >
+                Date Range
+              </button>
+              <button
+                type="button"
+                onClick={() => setCustomType("single")}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  customType === "single"
+                    ? "bg-white dark:bg-surface font-semibold text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 dark:text-gray-400"
+                }`}
+              >
+                Specific Day
+              </button>
+            </div>
+
+            {customType === "range" ? (
+              <div className="flex items-center gap-2 flex-wrap text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">From:</span>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="input py-1 px-2.5 text-xs rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-surface dark:text-white"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-slate-400">To:</span>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="input py-1 px-2.5 text-xs rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-surface dark:text-white"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs">
+                <span className="text-slate-400">Date:</span>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="input py-1 px-2.5 text-xs rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-surface dark:text-white"
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Top Metric Cards ── */}
