@@ -12,6 +12,8 @@ const uploadRoutes    = require("./routes/upload");
 const analyticsRoutes = require("./routes/analytics");
 
 const app = express();
+// Enable reverse proxy support for Render (allows secure cookies over HTTPS)
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3001;
 
 // ─────────────────────────────────────────────────

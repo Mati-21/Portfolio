@@ -7,10 +7,12 @@ const { requireAuth } = require("../middleware/auth");
 const router = express.Router();
 const prisma = new PrismaClient();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const COOKIE_OPTIONS = {
   httpOnly: true,          // Not accessible via JS
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax", // "none" required for cross-domain HTTPS
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
@@ -61,8 +63,8 @@ router.post("/login", async (req, res) => {
 router.post("/logout", (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
   return res.json({ message: "Logged out successfully" });
 });
