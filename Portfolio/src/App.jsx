@@ -24,6 +24,11 @@ function PortfolioContent() {
   const [activeProjectId, setActiveProjectId] = useState(getProjectIdFromHash());
 
   const wasInProjectRef = useRef(Boolean(activeProjectId));
+  const savedScrollYRef = useRef(null);
+  const savedProjectIdRef = useRef(null);
+  const initialProjectIdRef = useRef(null);
+  const savedCardDeltaRef = useRef(null);
+  const isRestoringScrollRef = useRef(false);
 
   // Initialize analytics tracker
   useEffect(() => {
@@ -79,6 +84,85 @@ function PortfolioContent() {
     }
   };
 
+  const restoreExactProjectPosition = () => {
+    isRestoringScrollRef.current = true;
+
+    let targetProjectId = savedProjectIdRef.current;
+    if (!targetProjectId) {
+      try {
+        targetProjectId = sessionStorage.getItem("portfolio_return_project_id");
+      } catch {}
+    }
+
+    let initialProjectId = initialProjectIdRef.current;
+    if (!initialProjectId) {
+      try {
+        initialProjectId = sessionStorage.getItem("portfolio_return_initial_id");
+      } catch {}
+    }
+
+    let rawScrollY = savedScrollYRef.current;
+    if (rawScrollY == null) {
+      try {
+        const stored = sessionStorage.getItem("portfolio_return_scroll_y");
+        if (stored) rawScrollY = parseFloat(stored);
+      } catch {}
+    }
+
+    let cardDelta = savedCardDeltaRef.current;
+    if (cardDelta == null) {
+      try {
+        const stored = sessionStorage.getItem("portfolio_return_card_delta");
+        if (stored) cardDelta = parseFloat(stored);
+      } catch {}
+    }
+
+    let attempts = 0;
+    const maxAttempts = 16;
+
+    const executeScroll = () => {
+      attempts++;
+      let targetY = null;
+
+      const cardEl = targetProjectId ? document.getElementById(`project-card-${targetProjectId}`) : null;
+
+      if (cardEl) {
+        const cardRect = cardEl.getBoundingClientRect();
+        const currentCardTop = cardRect.top + window.scrollY;
+
+        if (targetProjectId === initialProjectId && typeof cardDelta === "number") {
+          // Exactly the position relative to the card where the user clicked
+          targetY = Math.max(0, currentCardTop + cardDelta);
+        } else {
+          // If user navigated to a different project, align to that project's card
+          const navOffset = 80;
+          targetY = Math.max(0, currentCardTop - navOffset);
+        }
+      } else if (typeof rawScrollY === "number" && !isNaN(rawScrollY) && rawScrollY > 0) {
+        targetY = rawScrollY;
+      }
+
+      if (targetY !== null) {
+        if (window.__lenis) {
+          window.__lenis.scrollTo(targetY, { immediate: true, force: true });
+        }
+        window.scrollTo({ top: targetY, behavior: "instant" });
+      }
+
+      if (attempts < maxAttempts) {
+        requestAnimationFrame(() => {
+          setTimeout(executeScroll, attempts < 6 ? 25 : 60);
+        });
+      } else {
+        setTimeout(() => {
+          isRestoringScrollRef.current = false;
+        }, 200);
+      }
+    };
+
+    executeScroll();
+  };
+
   // Sync hash changes (e.g. browser Back / Forward buttons)
   useEffect(() => {
     const handleHashChange = () => {
@@ -87,11 +171,7 @@ function PortfolioContent() {
       setActiveProjectId(pId);
 
       if (prevWasInProject && !pId) {
-        const hash = window.location.hash;
-        if (!hash || hash === "#" || hash === "#home" || hash === "#projects") {
-          window.location.hash = "#projects";
-          scrollToProjects(true);
-        }
+        restoreExactProjectPosition();
       }
     };
 
@@ -99,73 +179,101 @@ function PortfolioContent() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  // When returning from a project detail page to portfolio, ensure visitor is scrolled to the Projects section
+  // When returning from a project detail page to portfolio, restore exact scroll position
   useEffect(() => {
     const wasInProject = wasInProjectRef.current;
     wasInProjectRef.current = Boolean(activeProjectId);
 
     if (wasInProject && !activeProjectId) {
-      const hash = window.location.hash;
-      if (!hash || hash === "#" || hash === "#home" || hash === "#projects") {
-        window.location.hash = "#projects";
-        scrollToProjects(true);
-      }
+      restoreExactProjectPosition();
     }
   }, [activeProjectId]);
 
-  // When returning to portfolio with any section hash (e.g. #about, #skills, #projects, #contact, #home)
+  // When navigating to portfolio sections from non-detail paths
   useEffect(() => {
     if (!activeProjectId) {
+      if (isRestoringScrollRef.current) return;
       const hash = window.location.hash;
       if (hash && !hash.includes("project")) {
         const targetId = hash.replace(/^#\/?/, "");
-        if (targetId) {
-          if (targetId === "projects") {
-            scrollToProjects(true);
-          } else {
-            const timer = setTimeout(() => {
-              if (targetId === "home") {
-                if (window.__lenis) {
-                  window.__lenis.scrollTo(0, { immediate: false });
-                } else {
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }
+        if (targetId && targetId !== "projects") {
+          const timer = setTimeout(() => {
+            if (targetId === "home") {
+              if (window.__lenis) {
+                window.__lenis.scrollTo(0, { immediate: false });
               } else {
-                const el = document.getElementById(targetId);
-                if (el) {
-                  if (window.__lenis) {
-                    window.__lenis.scrollTo(el, { offset: -70 });
-                  } else {
-                    el.scrollIntoView({ behavior: "smooth" });
-                  }
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            } else {
+              const el = document.getElementById(targetId);
+              if (el) {
+                if (window.__lenis) {
+                  window.__lenis.scrollTo(el, { offset: -70 });
+                } else {
+                  el.scrollIntoView({ behavior: "smooth" });
                 }
               }
-            }, 100);
-            return () => clearTimeout(timer);
-          }
+            }
+          }, 100);
+          return () => clearTimeout(timer);
         }
       }
     }
   }, [activeProjectId]);
 
-  const handleOpenProject = (projectId) => {
-    // Halt any running Lenis momentum immediately
+  const handleOpenProject = (projectId, originInfo = null) => {
+    const currentScrollY = window.scrollY || document.documentElement.scrollTop;
+    savedScrollYRef.current = currentScrollY;
+    initialProjectIdRef.current = projectId;
+    savedProjectIdRef.current = projectId;
+
+    const cardEl = document.getElementById(`project-card-${projectId}`);
+    if (cardEl) {
+      const cardRect = cardEl.getBoundingClientRect();
+      const absoluteCardTop = cardRect.top + currentScrollY;
+      savedCardDeltaRef.current = currentScrollY - absoluteCardTop;
+    } else {
+      savedCardDeltaRef.current = 0;
+    }
+
+    try {
+      sessionStorage.setItem("portfolio_return_scroll_y", String(currentScrollY));
+      sessionStorage.setItem("portfolio_return_project_id", projectId);
+      sessionStorage.setItem("portfolio_return_initial_id", projectId);
+      sessionStorage.setItem("portfolio_return_card_delta", String(savedCardDeltaRef.current));
+    } catch {}
+
     if (window.__lenis) {
       window.__lenis.stop();
-      window.__lenis.scrollTo(0, { immediate: true });
-      setTimeout(() => {
-        window.__lenis?.start();
-      }, 50);
+      window.__lenis.scrollTo(0, { immediate: true, force: true });
     }
     window.location.hash = `#/project/${projectId}`;
     setActiveProjectId(projectId);
+    window.scrollTo({ top: 0, behavior: "instant" });
+
+    setTimeout(() => {
+      window.__lenis?.start();
+    }, 50);
+  };
+
+  const handleSelectProjectFromDetail = (nextProjectId) => {
+    savedProjectIdRef.current = nextProjectId;
+    try {
+      sessionStorage.setItem("portfolio_return_project_id", nextProjectId);
+    } catch {}
+
+    if (window.__lenis) {
+      window.__lenis.scrollTo(0, { immediate: true, force: true });
+    }
+    window.location.hash = `#/project/${nextProjectId}`;
+    setActiveProjectId(nextProjectId);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const handleBackToPortfolio = () => {
     window.location.hash = "#projects";
     setActiveProjectId(null);
-    scrollToProjects(true);
+    restoreExactProjectPosition();
   };
 
   const handleNavigateFromDetail = (href) => {
@@ -175,8 +283,14 @@ function PortfolioContent() {
         window.__lenis?.start();
       }, 50);
     }
-    window.location.hash = href;
-    setActiveProjectId(null);
+    if (href === "#projects") {
+      window.location.hash = "#projects";
+      setActiveProjectId(null);
+      restoreExactProjectPosition();
+    } else {
+      window.location.hash = href;
+      setActiveProjectId(null);
+    }
   };
 
   return (
@@ -189,7 +303,7 @@ function PortfolioContent() {
         <ProjectDetailPage
           projectId={activeProjectId}
           onBack={handleBackToPortfolio}
-          onSelectProject={handleOpenProject}
+          onSelectProject={handleSelectProjectFromDetail}
         />
       ) : (
         <>

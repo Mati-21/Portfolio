@@ -16,7 +16,25 @@ import { projects } from "../data/projectsData";
 function ProjectSection({ onOpenProject }) {
   const { content, resolveMediaUrl } = useContent();
   const pSection = content?.projects || {};
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return sessionStorage.getItem("portfolio_project_filter") || "all";
+      } catch {
+        return "all";
+      }
+    }
+    return "all";
+  });
+
+  const handleFilterSelect = (filterId) => {
+    setActiveFilter(filterId);
+    try {
+      sessionStorage.setItem("portfolio_project_filter", filterId);
+    } catch {
+      // ignore
+    }
+  };
 
   const PROJECT_ID_MAP = {
     "amu-kpi": 1,
@@ -136,7 +154,7 @@ function ProjectSection({ onOpenProject }) {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveFilter(tab.id)}
+                onClick={() => handleFilterSelect(tab.id)}
                 className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors duration-200 cursor-pointer ${
                   activeFilter === tab.id
                     ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-600/30"
@@ -158,11 +176,13 @@ function ProjectSection({ onOpenProject }) {
             return (
               <motion.article
                 key={project.id}
-                initial={{ opacity: 0, y: 50 }}
+                id={`project-card-${project.id}`}
+                data-project-id={project.id}
+                initial={false}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.12 }}
-                transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-3xl bg-white/80 dark:bg-[#11121d]/85 border border-slate-200/60 dark:border-slate-800/60 p-6 sm:p-8 lg:p-10 backdrop-blur-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/50 overflow-hidden group hover:border-violet-500/40 dark:hover:border-violet-500/40 transition-[border-color,box-shadow] duration-300"
+                viewport={{ once: true, amount: 0.08 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className="relative rounded-3xl bg-white/80 dark:bg-[#11121d]/85 border border-slate-200/60 dark:border-slate-800/60 p-6 sm:p-8 lg:p-10 backdrop-blur-2xl shadow-xl shadow-slate-200/50 dark:shadow-black/50 overflow-hidden group hover:border-violet-500/40 dark:hover:border-violet-500/40 transition-[border-color,box-shadow] duration-300 scroll-mt-24"
               >
                 {/* Ambient glow in background */}
                 <div
@@ -196,7 +216,14 @@ function ProjectSection({ onOpenProject }) {
                       {/* Mockup Canvas: Real Image or Interactive Simulation */}
                       {project.mainImage ? (
                         <div
-                          onClick={() => onOpenProject(project.id)}
+                          id={`project-canvas-${project.id}`}
+                          onClick={() => {
+                            if (onOpenProject) {
+                              onOpenProject(project.id, { origin: "canvas", cardId: `project-card-${project.id}` });
+                            } else {
+                              window.location.hash = `#/project/${project.id}`;
+                            }
+                          }}
                           className="relative aspect-video min-h-[260px] sm:min-h-[300px] w-full overflow-hidden bg-slate-950 cursor-pointer group/canvas"
                         >
                           <img
@@ -412,9 +439,10 @@ function ProjectSection({ onOpenProject }) {
                     <div className="flex items-center gap-4 pt-3">
                       <button
                         type="button"
+                        id={`project-btn-${project.id}`}
                         onClick={() => {
                           if (onOpenProject) {
-                            onOpenProject(project.id);
+                            onOpenProject(project.id, { origin: "btn", cardId: `project-card-${project.id}` });
                           } else {
                             window.location.hash = `#/project/${project.id}`;
                           }

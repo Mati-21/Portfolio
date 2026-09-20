@@ -120,7 +120,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isHeaderSolid
           ? "bg-white/90 dark:bg-[#0b0c10]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-black/40 py-1"
-          : "bg-white/30 dark:bg-black/30 backdrop-blur-xl border-b border-white/20 dark:border-white/10 py-1.5"
+          : isDark
+          ? "bg-black/30 backdrop-blur-xl border-b border-white/10 py-1.5"
+          : "bg-white/70 backdrop-blur-xl border-b border-slate-200/60 shadow-sm py-1.5"
       }`}
     >
       {/* Container */}
@@ -139,16 +141,16 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
           </div>
           <span
             className={`text-lg sm:text-xl font-heading font-bold tracking-tight bg-clip-text text-transparent transition-all duration-300 ${
-              !isHeaderSolid
+              isDark
                 ? "bg-gradient-to-r from-white via-gray-100 to-violet-300"
-                : "bg-gradient-to-r from-slate-950 via-slate-800 to-violet-700 dark:from-white dark:via-gray-200 dark:to-violet-300"
+                : "bg-gradient-to-r from-slate-950 via-slate-800 to-violet-700"
             }`}
           >
             Mati
           </span>
         </motion.a>
 
-        {/* Desktop Navigation (white links over hero, contrast when scrolled) */}
+        {/* Desktop Navigation (contrast adapted for light & dark modes) */}
         <nav className="hidden lg:flex items-center space-x-1">
           {navItems.map((item, index) => {
             const isActive = activeSection === item.id;
@@ -163,9 +165,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
                 className={`relative px-3.5 py-1.5 rounded-full text-sm font-semibold transition-colors duration-200 cursor-pointer ${
                   isActive
                     ? "text-white font-semibold shadow-sm"
-                    : !isHeaderSolid
-                    ? "text-white hover:text-white/80 hover:bg-white/15 drop-shadow-sm"
-                    : "text-slate-800 dark:text-gray-200 hover:text-violet-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                    : isDark
+                    ? "text-white/90 hover:text-white hover:bg-white/15 drop-shadow-sm"
+                    : "text-slate-800 hover:text-violet-700 hover:bg-slate-100"
                 }`}
               >
                 {isActive && (
@@ -194,9 +196,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`p-2 rounded-lg transition-colors ${
-                  !isHeaderSolid
+                  isDark
                     ? "text-white/85 hover:text-white hover:bg-white/10"
-                    : "text-slate-700 dark:text-gray-400 hover:text-slate-950 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10"
+                    : "text-slate-700 hover:text-slate-950 hover:bg-slate-100"
                 }`}
                 aria-label="Social Link"
               >
@@ -211,9 +213,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
             whileHover={{ scale: 1.05 }}
             onClick={toggleTheme}
             className={`p-2 rounded-xl transition-colors cursor-pointer ${
-              !isHeaderSolid
-                ? "bg-white/15 hover:bg-white/25 text-amber-300 border border-white/20 shadow-sm"
-                : "bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-amber-300 border border-slate-200/80 dark:border-white/10 shadow-sm"
+              isDark
+                ? "bg-white/10 hover:bg-white/20 text-amber-300 border border-white/15 shadow-sm"
+                : "bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200/80 shadow-sm"
             }`}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
             title={isDark ? "Switch to light mode" : "Switch to dark mode"}
@@ -221,7 +223,7 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
             {isDark ? (
               <FiSun className="w-4 h-4 text-amber-300" />
             ) : (
-              <FiMoon className={`w-4 h-4 ${!isHeaderSolid ? "text-violet-300" : "text-violet-600"}`} />
+              <FiMoon className="w-4 h-4 text-violet-600" />
             )}
           </motion.button>
 
@@ -243,9 +245,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
             whileTap={{ scale: 0.85 }}
             onClick={toggleTheme}
             className={`p-2 rounded-lg transition-colors ${
-              !isHeaderSolid
-                ? "text-amber-300 bg-white/15 border border-white/20 shadow-sm"
-                : "text-slate-800 dark:text-amber-300 bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 shadow-sm"
+              isDark
+                ? "text-amber-300 bg-white/10 border border-white/15 shadow-sm"
+                : "text-violet-600 bg-slate-100 border border-slate-200/80 shadow-sm"
             }`}
             aria-label="Toggle theme"
           >
@@ -257,9 +259,9 @@ function Header({ isProjectDetail: isProjectDetailProp, onNavigate }) {
             whileTap={{ scale: 0.9 }}
             onClick={toggleButton}
             className={`p-2 rounded-lg transition-colors ${
-              !isHeaderSolid
-                ? "text-white hover:text-white bg-white/15 border border-white/20 shadow-sm"
-                : "text-slate-800 dark:text-gray-300 hover:text-slate-950 dark:hover:text-white bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 shadow-sm"
+              isDark
+                ? "text-white hover:text-white bg-white/10 border border-white/15 shadow-sm"
+                : "text-slate-800 hover:text-slate-950 bg-slate-100 border border-slate-200/80 shadow-sm"
             }`}
             aria-label="Toggle Navigation Menu"
           >
