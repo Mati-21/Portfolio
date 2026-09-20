@@ -28,7 +28,15 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const admin = await prisma.admin.findUnique({ where: { email } });
+    const trimmedEmail = email.trim();
+    const admin = await prisma.admin.findFirst({
+      where: {
+        email: {
+          equals: trimmedEmail,
+          mode: "insensitive",
+        },
+      },
+    });
 
     if (!admin) {
       return res.status(401).json({ error: "Invalid credentials" });
