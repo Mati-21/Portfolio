@@ -1,9 +1,8 @@
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("../config/prisma");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // ─────────────────────────────────────────────────
 // GET /api/content
@@ -25,7 +24,7 @@ router.get("/", async (req, res) => {
     return res.json({ content: grouped });
   } catch (err) {
     console.error("Get content error:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error", message: err.message });
   }
 });
 

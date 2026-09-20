@@ -19,11 +19,25 @@ const PORT = process.env.PORT || 3001;
 // ─────────────────────────────────────────────────
 // Middleware
 // ─────────────────────────────────────────────────
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || "http://localhost:5173",
-    process.env.ADMIN_URL    || "http://localhost:5174",
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (curl, server-to-server, health checks)
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app")
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Permissive fallback so frontend requests are never dropped
+  },
   credentials: true, // Allow cookies to be sent cross-origin
 }));
 

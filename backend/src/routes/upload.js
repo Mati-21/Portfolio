@@ -11,7 +11,7 @@ const {
   deleteFromCloudinary,
 } = require("../config/cloudinary");
 
-const prisma = new PrismaClient();
+const prisma = require("../config/prisma");
 const router = express.Router();
 
 // Ensure uploads directory exists for temporary upload handling

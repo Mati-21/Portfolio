@@ -1,9 +1,8 @@
 const express = require("express");
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("../config/prisma");
 const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // Helper to ensure session exists
 async function ensureSession(sessionId, sessionInfo = {}) {
