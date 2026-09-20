@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { defaultContent } from "../data/defaultContent";
 
 const BACKEND_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 const ContentContext = createContext({
-  content: {},
+  content: defaultContent,
   loading: true,
   resolveMediaUrl: (url) => url,
 });
@@ -12,11 +13,37 @@ export function ContentProvider({ children }) {
   const [content, setContent] = useState(() => {
     try {
       const cached = localStorage.getItem("portfolio_cached_content");
-      if (cached) return JSON.parse(cached);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        return {
+          ...defaultContent,
+          ...parsed,
+          projects: {
+            ...defaultContent.projects,
+            ...(parsed.projects || {}),
+          },
+          hero: {
+            ...defaultContent.hero,
+            ...(parsed.hero || {}),
+          },
+          about: {
+            ...defaultContent.about,
+            ...(parsed.about || {}),
+          },
+          skills: {
+            ...defaultContent.skills,
+            ...(parsed.skills || {}),
+          },
+          contact: {
+            ...defaultContent.contact,
+            ...(parsed.contact || {}),
+          },
+        };
+      }
     } catch {
       // ignore
     }
-    return {};
+    return defaultContent;
   });
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +53,30 @@ export function ContentProvider({ children }) {
       if (res.ok) {
         const json = await res.json();
         if (json && json.content) {
-          setContent(json.content);
+          setContent((prev) => ({
+            ...prev,
+            ...json.content,
+            projects: {
+              ...prev.projects,
+              ...(json.content.projects || {}),
+            },
+            hero: {
+              ...prev.hero,
+              ...(json.content.hero || {}),
+            },
+            about: {
+              ...prev.about,
+              ...(json.content.about || {}),
+            },
+            skills: {
+              ...prev.skills,
+              ...(json.content.skills || {}),
+            },
+            contact: {
+              ...prev.contact,
+              ...(json.content.contact || {}),
+            },
+          }));
           try {
             localStorage.setItem("portfolio_cached_content", JSON.stringify(json.content));
           } catch {
