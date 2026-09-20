@@ -4,7 +4,10 @@
  */
 
 const SESSION_STORAGE_KEY = "portfolio_visitor_session_id";
-const TRACK_ENDPOINT = "/api/analytics/track";
+const API_BASE = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL)
+  ? import.meta.env.VITE_API_URL.replace(/\/+$/, "")
+  : "";
+const TRACK_ENDPOINT = `${API_BASE}/api/analytics/track`;
 
 function generateUUID() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Eye, Monitor, Tablet, Smartphone, ExternalLink, RefreshCw } from "lucide-react";
 
-const PORTFOLIO_URL = "http://localhost:5173";
+const PORTFOLIO_URL = (import.meta.env.VITE_PORTFOLIO_URL || "http://localhost:5173").replace(/\/+$/, "");
 
 const DEVICES = [
   { key: "desktop",  label: "Desktop",  icon: Monitor,    width: "100%",    height: "100%" },

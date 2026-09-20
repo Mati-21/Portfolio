@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-const BACKEND_URL = "http://localhost:3001";
+const BACKEND_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 const ContentContext = createContext({
   content: {},
@@ -14,7 +14,7 @@ export function ContentProvider({ children }) {
 
   const fetchContent = async () => {
     try {
-      const res = await fetch("/api/content");
+      const res = await fetch(`${BACKEND_URL}/api/content`);
       if (res.ok) {
         const json = await res.json();
         if (json && json.content) {
@@ -43,7 +43,7 @@ export function ContentProvider({ children }) {
       return url;
     }
     if (url.startsWith("/uploads")) {
-      return `${BACKEND_URL}${url}`;
+      return `${BACKEND_URL || "http://localhost:3001"}${url}`;
     }
     return url;
   };

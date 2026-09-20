@@ -74,7 +74,8 @@ function ContactPage() {
 
     try {
       // 1. Submit to portfolio backend database
-      const response = await fetch("/api/contacts", {
+      const backendUrl = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+      const response = await fetch(`${backendUrl}/api/contacts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
